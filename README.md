@@ -8,7 +8,7 @@
 
 Este estudo foi desenvolvido para identificar os principais vetores de rotatividade (*turnover*) e absenteísmo em uma operação de atendimento ao cliente. 
 
-O projeto cobre desde o ciclo de tratamento da base bruta — com higienização contra duplicidades e eliminação de *outliers* através do **Intervalo Interquartil (IQR)** — até a extração de *insights* estratégicos para tomada de decisão em gestão de pessoas e operações.
+O projeto cobre desde o ciclo de tratamento da base bruta com higienização contra duplicidades e eliminação de *outliers* através do **Intervalo Interquartil (IQR)**, até a extração de *insights* estratégicos para tomada de decisão em gestão de pessoas e operações.
 
 ---
 
