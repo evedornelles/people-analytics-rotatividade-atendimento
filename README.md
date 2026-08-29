@@ -1,9 +1,64 @@
-Análise de Rotatividade e Absenteísmo na Operação de AtendimentoVisão Geral do ProjetoEste projeto analisa os fatores associados à rotatividade (turnover) e ao absenteísmo em uma equipe de atendimento ao cliente. O objetivo principal foi higienizar a base de dados original — eliminando inconsistências como registros duplicados e valores discrepantes (outliers) — para realizar cruzamentos estatísticos entre tempo de empresa, volume de chamados diários, escalas de turno e absenteísmo.A análise identifica as reais causas da perda de colaboradores na operação, servindo de subsídio para tomada de decisão em gestão de pessoas e dimensionamento de equipes.Estrutura dos Dados e Higienização1. Limpeza de Registro e DuplicidadesA base bruta continha registros duplicados gerados por falhas de integração nos sistemas de ponto e chamados.A verificação foi realizada avaliando a chave primária id_atendente e combinações completas de linhas.A eliminação das duplicatas evitou a contagem dupla de eventos de desligamento e manteve a integridade da amostragem ($N = 500$).2. Tratamento de OutliersPara evitar a distorção das estatísticas descritivas (como média e desvio padrão), aplicou-se a regra estatística do Intervalo Interquartil (IQR) sobre a variável volume_chamados_dia:$$IQR = Q_3 - Q_1$$Os limites de corte foram estabelecidos por:$$\text{Limite Superior} = Q_3 + 1.5 \times IQR$$Registros com volumes atípicos extremos (como de 380 a 420 chamados/dia, provenientes de inconsistências de log) e faltas mensais superiores ao número de dias úteis no mês foram filtrados, garantindo um conjunto de dados fidedigno para a modelagem analítica.Principais Achados da Análise+------------------+-----------------------+--------------------+
-| Turno            | Taxa de Desligamento  | Status do Turno    |
-+------------------+-----------------------+--------------------+
-| Manhã            | 23,80%                | Dentro da Média    |
-| Tarde            | 22,20%                | Menor Índice       |
-| Noite            | 25,90%                | Ligeira Elevação   |
-| Madrugada        | 28,41%                | Gargalo Crítico    |
-+------------------+-----------------------+--------------------+
-1. Concentração de Desligamentos por TurnoO turno da Madrugada apresentou a maior taxa de rotatividade da operação (28,41%), superando significativamente os turnos da Tarde (22,20%) e Manhã (23,80%).Diagnóstico: O desgaste operacional do trabalho noturno atua como o principal vetor de saída espontânea de colaboradores.2. Perfil de Permanência dos Colaboradores DesligadosA média de tempo de empresa entre os colaboradores desligados é de 30,6 meses (~2,5 anos), índice equivalente ao dos colaboradores ativos (31,2 meses).Diagnóstico: O problema da operação não está concentrado na curva de aprendizado ou na retenção inicial (onboarding/novatos), mas sim na perda contínua de colaboradores experientes (seniores) que atingem um teto de permanência na empresa.3. Volume de Atendimentos vs. AbsenteísmoO coeficiente de correlação de Pearson entre o volume diário de chamados e os dias de falta no mês foi de $r = 0,02$.A média de chamados atendeu padrões similares entre colaboradores ativos ($44,40$ chamados/dia) e desligados ($45,47$ chamados/dia).Diagnóstico: A carga individual de chamados por dia não possui relação direta com o número de faltas do atendente. O absenteísmo não é explicado de forma isolada por sobrecarga pontual de meta diária.Recomendações Estratégicas de NegócioPlano de Incentivo ao Turno Noturno/Madrugada: Reestruturar a escala de trabalho do período noturno, avaliando modelos de escala reduzida, adicionais de retenção ou benefícios voltados à saúde e transporte.Plano de Carreira para Colaboradores Seniores: Criar trilhas de desenvolvimento para atendentes que atingem a faixa de 2 a 3 anos de empresa, reduzindo o turnover de profissionais capacitados.Acompanhamento de Absenteísmo Multifatorial: Desassociar o foco exclusivo de volume de chamados como métrica de esgotamento e investigar fatores qualitativos (clima organizacional, suporte de liderança e ergonomia).Tecnologias UtilizadasLinguagem: Python 3.12Manipulação de Dados: Pandas, NumPyVisualização de Dados: Matplotlib, SeabornAmbiente de Desenvolvimento: VS Code
+# People Analytics: Análise de Rotatividade e Absenteísmo no Atendimento
+
+> **Estudo de Caso:** Diagnóstico e mitigação de *turnover* operacional a partir do tratamento e análise estatística de dados de atendimento.
+
+---
+
+## Visão Geral do Projeto
+
+Este estudo foi desenvolvido para identificar os principais vetores de rotatividade (*turnover*) e absenteísmo em uma operação de atendimento ao cliente. 
+
+O projeto cobre desde o ciclo de tratamento da base bruta — com higienização contra duplicidades e eliminação de *outliers* através do **Intervalo Interquartil (IQR)** — até a extração de *insights* estratégicos para tomada de decisão em gestão de pessoas e operações.
+
+---
+
+## Dashboard de Resultados
+
+![Dashboard de Rotatividade e Permanência](dashboard_rotatividade_moderno.png)
+
+---
+
+## Tratamento e Higienização de Dados
+
+Antes das análises exploratórias, a base passou por dois filtros rigorosos para garantir a integridade dos resultados:
+
+1. **Validação de Duplicidades:** Remoção de registros duplicados oriundos de falhas de log, preservando a amostragem limpa ($N = 500$).
+2. **Tratamento de Outliers (Método IQR):** Aplicação do cálculo de quartis para identificar e remover volumes discrepantes na variável de chamados diários e ausências irreais:
+
+$$IQR = Q_3 - Q_1$$
+$$\text{Limite Superior} = Q_3 + 1.5 \times IQR$$
+
+---
+
+## Principais Achados & Diagnósticos
+
+### 1. Gargalo Operacional no Turno Noturno
+* O turno da **Madrugada** apresentou o maior índice de desligamentos (**28,41%**), superando significativamente a média dos demais turnos (Tarde: **22,20%**, Manhã: **23,80%**).
+* **Conclusão:** O desgaste e as condições associadas ao trabalho noturno atuam como o principal direcionador de saída de colaboradores.
+
+### 2. Perfil de Saída: Foco em Colaboradores Seniores
+* A permanência média dos colaboradores desligados é de **30,6 meses** (~2,5 anos), praticamente igual à média dos ativos (**31,2 meses**).
+* **Conclusão:** A operação não sofre com a retenção inicial (novatos em *onboarding*), mas sim com a perda recorrente de profissionais experientes que atingem um teto na empresa.
+
+### 3. Carga Diária de Chamados vs. Absenteísmo
+* A correlação estatística entre o volume diário de chamados e os dias de falta foi nula ($r = 0,02$).
+* **Conclusão:** O absenteísmo não é explicado de forma simples por picos de chamados diários, indicando a necessidade de avaliar fatores qualitativos de clima e liderança.
+
+---
+
+## Recomendações Estratégicas
+
+*  **Ações para o Turno da Madrugada:** Implementação de adicionais de permanência, readequação de escalas e suporte específico à saúde para mitigar a rotatividade no período noturno.
+*  **Plano de Retenção de Seniores:** Construção de trilhas de carreira e incentivos estruturados para profissionais que atingem a marca de 2 anos na operação.
+*  **Monitoramento Qualitativo de Clima:** Avaliação periódica de fatores ergonômicos e suporte gerencial para compreender a origem do absenteísmo fora das métricas de volume.
+
+---
+
+## Tecnologias e Bibliotecas
+
+* **Linguagem:** Python 
+* **Análise de Dados:** Pandas, NumPy
+* **Visualização:** Matplotlib, Seaborn
+* **IDE:** Visual Studio Code
+
+---
